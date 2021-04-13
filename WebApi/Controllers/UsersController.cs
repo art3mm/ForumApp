@@ -141,6 +141,10 @@ namespace WebApi.Controllers
         public ActionResult<IEnumerable<UserModel>> GetLoggedInUsers()
         {
             var users = _userService.GetLoggedInUsers().ToList();
+
+            if (users.Count() == 0)
+                return Ok("No logged in users were found");
+
             return Ok(users);
         }
 
@@ -175,7 +179,7 @@ namespace WebApi.Controllers
 
         [Authorize]
         [HttpGet("messages")]
-        public ActionResult<IEnumerable<CurrentUserMessageModel>> GetCurrentUsersMessages()
+        public ActionResult<IEnumerable<CurrentUserMessageModel>> GetCurrentUserMessages()
         {
             var messages = _messageService.GetCurrentUsersMessages(this.User);
             if (messages.Count() == 0)

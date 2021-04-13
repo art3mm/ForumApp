@@ -61,7 +61,7 @@ namespace WebApi.Controllers
             }
             catch (ForumException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 

@@ -65,7 +65,7 @@ namespace WebApi.Controllers
             var topics = _topicService.FindTopicsByTitleKeyWord(titleKeyWord);
 
             if (topics.Count() == 0)
-                return Ok("No topics where found");
+                return Ok("No topics were found");
 
             return Ok(topics);
         }
@@ -107,7 +107,7 @@ namespace WebApi.Controllers
             }
             catch (ForumException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 

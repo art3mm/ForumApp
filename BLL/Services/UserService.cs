@@ -39,7 +39,16 @@ namespace BLL.Services
             if (user == null)
                 throw new ForumException($"User with nickname {modelNickName} is not found", modelNickName);
 
+            var messages = _unitOfWork.MessageRepository.GetAllWithDetails().Where(u => u.ApplicationUserId == user.Id).ToList();
+            
+            var updatedMessages = messages.Select(u => u.ApplicationUserId = "DELETED");
+            
+            user.Messages = null;
+            
+            await _unitOfWork.SaveAsync();
+            
             await _unitOfWork.ApplicationUserRepository.DeleteUserByIdAsync(user.Id);
+            
             await _unitOfWork.SaveAsync();
         }
 
@@ -140,7 +149,15 @@ namespace BLL.Services
             var userId = _userManager.GetUserId(claimsPrincipal);
          
             await this.LogOutAsync(claimsPrincipal);
-            
+
+            var messages = _unitOfWork.MessageRepository.GetAllWithDetails().Where(u=>u.ApplicationUserId==userId).ToList();
+
+            user.Messages = null;
+
+            var updatedMessages = messages.Select(u => u.ApplicationUserId = "DELETED");
+
+            await _unitOfWork.SaveAsync();
+
             await _unitOfWork.ApplicationUserRepository.DeleteUserByIdAsync(userId);
             
             await _unitOfWork.SaveAsync();

@@ -67,7 +67,7 @@ namespace BLL.Services
             if (message == null)
                 throw new ForumException("No message was found with such Id", "modelId");
 
-            if(message.ApplicationUserId!=user.Id)
+            if(message.ApplicationUserId!=user.Id && !_userManager.GetRolesAsync(user).Result.Contains("admin"))
                 throw new ForumException("No message was found for current User", "ApplicationUserId");
 
             await _unitOfWork.MessageRepository.DeleteByIdAsync(modelId);

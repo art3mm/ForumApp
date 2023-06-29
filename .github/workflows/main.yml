@@ -3,7 +3,7 @@ name: Deploy AWS Stack
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\WebApi\\WebApi.csproj": {}
+    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {}
   },
   "projects": {
-    "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\BLL.csproj": {
+    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\BLL.csproj",
+        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
         "projectName": "BLL",
-        "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\BLL.csproj",
-        "packagesPath": "C:\\Users\\Katerina\\.nuget\\packages\\",
-        "outputPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\obj\\",
+        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
+        "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
+        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Katerina\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +28,8 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj": {
-                "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj"
+              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
               }
             }
           }
@@ -63,7 +63,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -72,21 +73,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj": {
+    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj",
+        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
         "projectName": "DAL",
-        "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj",
-        "packagesPath": "C:\\Users\\Katerina\\.nuget\\packages\\",
-        "outputPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\obj\\",
+        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
+        "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
+        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Katerina\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -143,7 +144,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -152,21 +154,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\WebApi\\WebApi.csproj": {
+    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\WebApi\\WebApi.csproj",
+        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
         "projectName": "WebApi",
-        "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\WebApi\\WebApi.csproj",
-        "packagesPath": "C:\\Users\\Katerina\\.nuget\\packages\\",
-        "outputPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\WebApi\\obj\\",
+        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
+        "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
+        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Katerina\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -180,11 +182,11 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\BLL.csproj": {
-                "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\BLL\\BLL.csproj"
+              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
+                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj"
               },
-              "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj": {
-                "projectPath": "e:\\Art\\C#\\EPAM\\FastTrack\\Project\\ForumApp\\DAL\\DAL.csproj"
+              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
               }
             }
           }
@@ -212,7 +214,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -224,7 +227,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
         }
       }
     }

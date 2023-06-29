@@ -5,7 +5,7 @@ Resources:
   MyBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: forum-app-bucket-1 # Replace this with your desired bucket name
+      BucketName: forum-app-bucket # Replace this with your desired bucket name
       AccessControl: Private # Set the desired access control level for the bucket
       VersioningConfiguration:
         Status: Enabled # Enable versioning if desired

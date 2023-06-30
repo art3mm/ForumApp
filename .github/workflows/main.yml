@@ -3,7 +3,7 @@ name: Deploy AWS Stack
 env:
   TEMPLATE_FILE: "ENV/forum-stack.yaml"
   AWS_STACK_NAME : "forum-stack"
-  AWS_RGION_NAME : "us-east-1"
+  AWS_REGION_NAME : "us-east-1"
   DOCKER_FILE_NAME : "Dockerfile"
 
 on:
@@ -45,7 +45,7 @@ jobs:
     #   with:
     #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
     #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws-region: ${{env.AWS_RGION_NAME}} # Replace with your desired AWS region
+    #     aws-region: ${{env.AWS_REGION_NAME}} # Replace with your desired AWS region
     
     # - name: Install AWS CLI
     #   run: |
@@ -64,7 +64,7 @@ jobs:
     
     # - name: Fetch AWS stack output and set as env variable
     #   run: |
-    #     aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region ${{env.AWS_RGION_NAME}} > stack_info.json
+    #     aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region ${{env.AWS_REGION_NAME}} > stack_info.json
     #     export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="RepositoryURL") | .OutputValue' stack_info.json)
     #     echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
 
@@ -78,8 +78,8 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      with:
-        region: ${{env.AWS_RGION_NAME}}
+      # with:
+      #   region: ${{env.AWS_REGION_NAME}}
     
     - name: Build Docker image
       run: docker build . --file ${{env.DOCKER_FILE_NAME}} --tag forum-app:latest

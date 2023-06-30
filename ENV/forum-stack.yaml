@@ -2,18 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS CloudFormation template to create an S3 bucket'
 
 Resources:
-  MyBucket:
-    Type: 'AWS::S3::Bucket'
+  ECRRepository:
+    Type: 'AWS::ECR::Repository'
     Properties:
-      BucketName: forum-app-bucket-2 # Replace this with your desired bucket name
-      AccessControl: Private # Set the desired access control level for the bucket
-      VersioningConfiguration:
-        Status: Enabled # Enable versioning if desired
+      RepositoryName: forum-app
 
 Outputs:
-  BucketName:
-    Description: 'The name of the created S3 bucket'
-    Value: !Ref MyBucket
-  BucketArn:
-    Description: 'The ARN of the created S3 bucket'
-    Value: !GetAtt MyBucket.Arn
+  RepositoryURL:
+    Description: The URL of the created ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"

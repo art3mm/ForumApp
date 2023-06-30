@@ -14,6 +14,29 @@ on:
       - "ENV/**"
 
 jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+          
+      - name: Enable NuGet authentication
+        run: |
+          dotnet new nugetconfig
+          dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "NuGet"
+          
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
   deploy:
     runs-on: ubuntu-latest
 

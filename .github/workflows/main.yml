@@ -36,3 +36,13 @@ jobs:
           --stack-name $STACK_NAME \
           --template-file $TEMPLATE_FILE \
           --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
+    
+    - name: Fetch AWS stack output and set as env variable
+      run: |
+        aws cloudformation describe-stacks --stack-name my-stack-name > stack_info.json
+        export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="ECRRepository") | .OutputValue' stack_info.json)
+        echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
+
+    - name: Use env variable
+      run: |
+        echo "Output value from AWS stack: $ECR_REPOSITORY"

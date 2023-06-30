@@ -104,4 +104,4 @@ jobs:
           --template-file $TEMPLATE_FILE \
           --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
           --parameter-overrides \
-            ImageUrl=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION_NAME }}.amazonaws.com/forum-app:latest \
+            ImageUrl=5424236539.dkr.ecr.${{ env.AWS_REGION_NAME }}.amazonaws.com/forum-app:latest \

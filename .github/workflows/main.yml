@@ -103,5 +103,5 @@ jobs:
           --stack-name $STACK_NAME \
           --template-file $TEMPLATE_FILE \
           --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
-          --parameter-overrides \
-            ImageUrl=5424236539.dkr.ecr.${{ env.AWS_REGION_NAME }}.amazonaws.com/forum-app:latest \
+          --parameters \
+            ParameterKey=ImageUrl,ParameterValue=5424236539.dkr.ecr.us-east-1.amazonaws.com/my-dotnet-app:latest \

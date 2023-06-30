@@ -1,5 +1,11 @@
 name: Deploy AWS Stack
 
+env:
+  TEMPLATE_FILE: "ENV/forum-stack.yaml"
+  AWS_STACK_NAME : "forum-stack"
+  AWS_RGION_NAME : "us-east-1"
+  DOCKER_FILE_NAME : "Dockerfile"
+
 on:
   push:
     branches:
@@ -20,7 +26,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1 # Replace with your desired AWS region
+        aws-region: ${{env.AWS_RGION_NAME}} # Replace with your desired AWS region
     
     - name: Install AWS CLI
       run: |
@@ -29,8 +35,8 @@ jobs:
 
     - name: Deploy CloudFormation stack
       run: |
-        STACK_NAME="forum-stack" # Replace with your desired stack name
-        TEMPLATE_FILE="ENV/forum-stack.yaml" # Replace with the path to your CloudFormation template
+        STACK_NAME=${{env.AWS_STACK_NAME}} # Replace with your desired stack name
+        TEMPLATE_FILE=${{env.TEMPLATE_FILE}} # Replace with the path to your CloudFormation template
 
         aws cloudformation deploy \
           --stack-name $STACK_NAME \
@@ -39,10 +45,22 @@ jobs:
     
     - name: Fetch AWS stack output and set as env variable
       run: |
-        aws cloudformation describe-stacks --stack-name forum-stack --region us-east-1 > stack_info.json
+        aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region ${{env.AWS_RGION_NAME}} > stack_info.json
         export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="RepositoryURL") | .OutputValue' stack_info.json)
         echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
 
     - name: Use env variable
       run: |
         echo "Output value from AWS stack: $ECR_REPOSITORY"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        region: ${{env.AWS_RGION_NAME}}
+    
+    - name: Build Docker image
+      run: docker build . --file ${{env.DOCKER_FILE_NAME}} --tag forum-app:latest

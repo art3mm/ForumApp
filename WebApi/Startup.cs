@@ -41,7 +41,7 @@ namespace WebApplication1
             services.AddControllers();
 
             services.AddDbContext<ForumDbContext>(options =>
-            options.UseSqlServer(_configuration.GetConnectionString("ForumDbConnection")).UseLazyLoadingProxies()
+            options.UseSqlServer(_configuration.GetConnectionString("ForumDbConnection"))
             );
 
             services.Configure<IdentityOptions>(options =>

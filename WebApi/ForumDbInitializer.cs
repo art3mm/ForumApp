@@ -1,5 +1,4 @@
-﻿using Castle.Core.Configuration;
-using DAL.Entities;
+﻿using DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;

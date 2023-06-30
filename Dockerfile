@@ -10,6 +10,7 @@ WORKDIR /src
 COPY ["WebApi/*.csproj", "WebApi/"]
 COPY ["BLL/*.csproj", "BLL/"]
 COPY ["DAL/*.csproj", "DAL/"]
+COPY nuget.config .
 RUN dotnet restore "WebApi/WebApi.csproj"
 COPY . .
 WORKDIR "/src/WebApi"

@@ -1,10 +1,12 @@
 name: Deploy AWS Stack
 
 env:
-  TEMPLATE_FILE    : "ENV/forum-stack.yaml"
-  AWS_STACK_NAME   : "forum-stack"
-  AWS_REGION_NAME  : "us-east-1"
-  DOCKER_FILE_NAME : "Dockerfile"
+  TEMPLATE_FILE         : "ENV/forum-stack.yaml"
+  AWS_STACK_NAME        : "forum-stack"
+  FARGATE_STACK_NAME    : "fargate-stack"
+  AWS_REGION_NAME       : "us-east-1"
+  DOCKER_FILE_NAME      : "Dockerfile"
+  FARGATE_TEMPLATE_FILE : "ENV/fargate-stack.yaml"
 
 on:
   push:
@@ -52,25 +54,25 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y awscli
 
-    # - name: Deploy CloudFormation stack
-    #   run: |
-    #     STACK_NAME=${{env.AWS_STACK_NAME}} # Replace with your desired stack name
-    #     TEMPLATE_FILE=${{env.TEMPLATE_FILE}} # Replace with the path to your CloudFormation template
+    - name: Deploy CloudFormation stack
+      run: |
+        STACK_NAME=${{env.AWS_STACK_NAME}} # Replace with your desired stack name
+        TEMPLATE_FILE=${{env.TEMPLATE_FILE}} # Replace with the path to your CloudFormation template
 
-    #     aws cloudformation deploy \
-    #       --stack-name $STACK_NAME \
-    #       --template-file $TEMPLATE_FILE \
-    #       --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
+        aws cloudformation deploy \
+          --stack-name $STACK_NAME \
+          --template-file $TEMPLATE_FILE \
+          --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
     
-    # - name: Fetch AWS stack output and set as env variable
-    #   run: |
-    #     aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region ${{env.AWS_REGION_NAME}} > stack_info.json
-    #     export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="RepositoryURL") | .OutputValue' stack_info.json)
-    #     echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
+    - name: Fetch AWS stack output and set as env variable
+      run: |
+        aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} --region ${{env.AWS_REGION_NAME}} > stack_info.json
+        export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="RepositoryURL") | .OutputValue' stack_info.json)
+        echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
 
-    # - name: Use env variable
-    #   run: |
-    #     echo "Output value from AWS stack: $ECR_REPOSITORY"
+    - name: Use env variable
+      run: |
+        echo "Output value from AWS stack: $ECR_REPOSITORY"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -91,3 +93,15 @@ jobs:
         IMAGE_ID=$(docker images --quiet forum-app:latest)
         docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/forum-app:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/forum-app:latest
+
+    - name: Deploy Fargate stack
+      run: |
+        STACK_NAME=${{env.FARGATE_STACK_NAME}} # Replace with your desired stack name
+        TEMPLATE_FILE=${{env.FARGATE_TEMPLATE_FILE}} # Replace with the path to your CloudFormation template
+
+        aws cloudformation deploy \
+          --stack-name $STACK_NAME \
+          --template-file $TEMPLATE_FILE \
+          --capabilities CAPABILITY_NAMED_IAM # Modify the `--capabilities` flag as needed
+          --parameter-overrides \
+            ImageUrl=${{env.ECR_REPOSITORY}}:latest \

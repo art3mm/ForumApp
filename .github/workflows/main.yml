@@ -40,7 +40,7 @@ jobs:
     - name: Fetch AWS stack output and set as env variable
       run: |
         aws cloudformation describe-stacks --stack-name forum-stack --region us-east-1 > stack_info.json
-        export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="ECRRepository") | .OutputValue' stack_info.json)
+        export ECR_REPOSITORY=$(jq -r '.Stacks[0].Outputs[] | select(.OutputKey=="RepositoryURL") | .OutputValue' stack_info.json)
         echo "ECR_REPOSITORY=$ECR_REPOSITORY" >> $GITHUB_ENV
 
     - name: Use env variable

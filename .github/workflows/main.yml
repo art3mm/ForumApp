@@ -78,8 +78,10 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      # with:
-      #   region: ${{env.AWS_REGION_NAME}}
+      with:
+        skip-logout: false
+        registry-type: private
+        region: ${{ env.AWS_REGION_NAME }}
     
     - name: Build Docker image
       run: docker build . --file ${{env.DOCKER_FILE_NAME}} --tag forum-app:latest

@@ -10,3 +10,16 @@ e:\Art\C#\EPAM\FastTrack\Project\PL\DAL\obj\Release\netcoreapp3.1\DAL.csproj.Cor
 e:\Art\C#\EPAM\FastTrack\Project\PL\DAL\obj\Release\netcoreapp3.1\DAL.dll
 e:\Art\C#\EPAM\FastTrack\Project\PL\DAL\obj\Release\netcoreapp3.1\DAL.pdb
 e:\Art\C#\EPAM\FastTrack\Project\PL\DAL\obj\Release\netcoreapp3.1\DAL.genruntimeconfig.cache
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\bin\Release\netcoreapp3.1\DAL.deps.json
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\bin\Release\netcoreapp3.1\DAL.runtimeconfig.json
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\bin\Release\netcoreapp3.1\DAL.runtimeconfig.dev.json
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\bin\Release\netcoreapp3.1\DAL.dll
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\bin\Release\netcoreapp3.1\DAL.pdb
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.csproj.AssemblyReference.cache
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.AssemblyInfoInputs.cache
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.AssemblyInfo.cs
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.csproj.CoreCompileInputs.cache
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.dll
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.pdb
+C:\Edu\AWS_Art\Cloud_Mentor\ForumApp\DAL\obj\Release\netcoreapp3.1\DAL.genruntimeconfig.cache

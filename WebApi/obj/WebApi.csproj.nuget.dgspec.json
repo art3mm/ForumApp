@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {}
+    "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {}
   },
   "projects": {
-    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
+    "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
+        "projectUniqueName": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
         "projectName": "BLL",
-        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
+        "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
         "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
-        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\obj\\",
+        "outputPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
-                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
+              "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+                "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
               }
             }
           }
@@ -77,14 +77,14 @@
         }
       }
     },
-    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+    "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
+        "projectUniqueName": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
         "projectName": "DAL",
-        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
+        "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
         "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
-        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\obj\\",
+        "outputPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -158,14 +158,14 @@
         }
       }
     },
-    "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {
+    "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
+        "projectUniqueName": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
         "projectName": "WebApi",
-        "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
+        "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\WebApi.csproj",
         "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
-        "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\obj\\",
+        "outputPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\WebApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -182,11 +182,11 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
-                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj"
+              "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj": {
+                "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj"
               },
-              "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
-                "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
+              "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+                "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
               }
             }
           }

@@ -8673,11 +8673,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
+      "projectUniqueName": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
       "projectName": "BLL",
-      "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
+      "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\BLL.csproj",
       "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
-      "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\obj\\",
+      "outputPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\BLL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -8694,8 +8694,8 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
-              "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
+            "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj": {
+              "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj"
             }
           }
         }

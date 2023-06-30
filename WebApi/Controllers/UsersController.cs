@@ -49,6 +49,13 @@ namespace WebApi.Controllers
 
 
         [AllowAnonymous]
+        [HttpGet("test")]
+        public ActionResult TestUser()
+        {
+            return Ok("Hello");
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult> RegisterNewUser([FromBody]RegisterUserModel registerUserModel)
         {

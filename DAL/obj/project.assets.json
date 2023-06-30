@@ -7824,11 +7824,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
+      "projectUniqueName": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
       "projectName": "DAL",
-      "projectPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
+      "projectPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\DAL.csproj",
       "packagesPath": "C:\\Users\\Artem_Mostovyi\\.nuget\\packages\\",
-      "outputPath": "c:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\obj\\",
+      "outputPath": "C:\\Edu\\AWS_Art\\Cloud_Mentor\\ForumApp\\DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Artem_Mostovyi\\AppData\\Roaming\\NuGet\\NuGet.Config",

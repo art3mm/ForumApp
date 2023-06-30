@@ -9,5 +9,5 @@ Resources:
 
 Outputs:
   RepositoryURL:
-    Description: The URL of the created ECR repository
+    Description: The URL of the created ECR repository 1
     Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"

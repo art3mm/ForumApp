@@ -26,10 +26,10 @@ jobs:
         with:
           dotnet-version: 3.1
           
-      - name: Enable NuGet authentication
-        run: |
-          dotnet new nugetconfig
-          dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "NuGet"
+      # - name: Enable NuGet authentication
+      #   run: |
+      #     dotnet new nugetconfig
+      #     dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "NuGet"
           
       - name: Restore dependencies
         run: dotnet restore

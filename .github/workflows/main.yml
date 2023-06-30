@@ -1,9 +1,9 @@
 name: Deploy AWS Stack
 
 env:
-  TEMPLATE_FILE: "ENV/forum-stack.yaml"
-  AWS_STACK_NAME : "forum-stack"
-  AWS_REGION_NAME : "us-east-1"
+  TEMPLATE_FILE    : "ENV/forum-stack.yaml"
+  AWS_STACK_NAME   : "forum-stack"
+  AWS_REGION_NAME  : "us-east-1"
   DOCKER_FILE_NAME : "Dockerfile"
 
 on:

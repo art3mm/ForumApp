@@ -1,0 +1,227 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation template to create ECS for Awsdotneteshop app'
+
+Resources:
+  ECSServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecs-service-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+              
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  ECSPublicSubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      CidrBlock: "10.0.1.0/24"
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
+      AvailabilityZone:
+        Fn::Select: 
+          - 0
+          - Fn::GetAZs: ""
+
+  ECSPrivateSubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      CidrBlock: "10.0.2.0/24"
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref VPC
+      AvailabilityZone:
+        Fn::Select: 
+          - 1
+          - Fn::GetAZs: ""
+      
+  ECSEshopSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP(S) traffic to ECS tasks
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicSubnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ECSPublicSubnet
+      RouteTableId: !Ref PublicSubnetRouteTable
+
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref ECSPublicSubnet
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+
+  PrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateSubnetRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ECSPrivateSubnet
+      RouteTableId: !Ref PrivateSubnetRouteTable
+
+  WebAggregatorLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/WebAggregator
+      RetentionInDays: 7
+
+  CatalogApiLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/CatalogApi
+      RetentionInDays: 7
+
+  ECSFargateTaskDefinitionWebAggregator:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ecs-fargate-task-web-aggregator
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !Ref ECSServiceRole
+      ContainerDefinitions:
+        - Name: ecs-fargate-container-web-aggregator
+          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "web-aggregator:latest"]]
+          Essential: true
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref WebAggregatorLogsGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: WebAggregator
+
+  ECSFargateTaskDefinitionCatalogApi:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ecs-fargate-task-catalog-api
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !Ref ECSServiceRole
+      ContainerDefinitions:
+        - Name: ecs-fargate-container-catalog-api
+          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "catalog-api:latest"]]
+          Essential: true
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref CatalogApiLogsGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: CatalogApi
+
+  ECSEshopCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: ecs-eshop-cluster
+
+  ECSFargateServiceWebAggregator:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: ecs-fargate-web-aggregator-service
+      Cluster: !Ref ECSEshopCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinitionWebAggregator
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - !Ref ECSEshopSecurityGroup
+          Subnets:
+          - !Ref ECSPublicSubnet
+
+  ECSFargateServiceCatalogApi:
+      Type: AWS::ECS::Service
+      Properties:
+        ServiceName: ecs-fargate-catalog-api-service
+        Cluster: !Ref ECSEshopCluster
+        TaskDefinition: !Ref ECSFargateTaskDefinitionCatalogApi
+        DeploymentConfiguration:
+          MinimumHealthyPercent: 0
+          MaximumPercent: 100
+        DesiredCount: 1
+        LaunchType: FARGATE
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            AssignPublicIp: DISABLED
+            SecurityGroups:
+            - !Ref ECSEshopSecurityGroup
+            Subnets:
+            - !Ref ECSPrivateSubnet
+
+  WebAggregatorApiGateway:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "web-aggregator-apigateway"

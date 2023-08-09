@@ -59,7 +59,7 @@ jobs:
         region: ${{ env.AWS_REGION_NAME }}
     
     - name: Build web-aggregator Docker image
-      run: docker-compose build webshoppingagg
+      run: docker-compose -f src/docker-compose.yml build webshoppingagg
 
     - name: Tag and push web-aggregator Docker image
       run: |

@@ -6,8 +6,8 @@ env:
   ECS_TEMPLATE_FILE               : "ecs-template.yaml"
   ECS_STACK_NAME                  : "awsdotneteshop-ecs"
   AWS_REGION_NAME                 : "us-east-1" 
-  AGGREGATOR_DOCKER_FILE_NAME     : "src/ApiGateways/Web.Bff.Shopping/aggregator/Dockerfile"
-  CATALOG_API_DOCKER_FILE_NAME    : "src/Services/Catalog/Catalog.API/Dockerfile"
+  # AGGREGATOR_DOCKER_FILE_NAME     : "src/ApiGateways/Web.Bff.Shopping/aggregator/Dockerfile"
+  # CATALOG_API_DOCKER_FILE_NAME    : "src/Services/Catalog/Catalog.API/Dockerfile"
 
 on:
   push:

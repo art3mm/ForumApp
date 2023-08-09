@@ -63,7 +63,7 @@ jobs:
 
     - name: Tag and push web-aggregator Docker image
       run: |
-        IMAGE_ID=$(docker images --quiet webshoppingagg:latest)
+        IMAGE_ID=$(docker images --quiet eshop/webshoppingagg:linux-latest)
         docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/web-aggregator:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/web-aggregator:latest
 

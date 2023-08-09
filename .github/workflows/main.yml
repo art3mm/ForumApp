@@ -68,11 +68,11 @@ jobs:
         docker push ${{ steps.login-ecr.outputs.registry }}/web-aggregator:latest
 
     - name: Build catalog-api Docker image
-      run: docker build . --file ${{env.CATALOG_API_DOCKER_FILE_NAME}} --tag catalog-api:latest
+      run: docker-compose -f src/docker-compose.yml build catalog-api
 
     - name: Tag and push catalog-api Docker image
       run: |
-        IMAGE_ID=$(docker images --quiet catalog-api:latest)
+        IMAGE_ID=$(docker images --quiet eshop/catalog.api:linux-latest)
         docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
 

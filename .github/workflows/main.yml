@@ -59,11 +59,11 @@ jobs:
         region: ${{ env.AWS_REGION_NAME }}
     
     - name: Build web-aggregator Docker image
-      run: docker build . --file ${{env.AGGREGATOR_DOCKER_FILE_NAME}} --tag web-aggregator:latest
+      run: docker-compose build webshoppingagg
 
     - name: Tag and push web-aggregator Docker image
       run: |
-        IMAGE_ID=$(docker images --quiet web-aggregator:latest)
+        IMAGE_ID=$(docker images --quiet webshoppingagg:latest)
         docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/web-aggregator:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/web-aggregator:latest
 

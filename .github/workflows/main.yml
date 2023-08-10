@@ -6,8 +6,6 @@ env:
   ECS_TEMPLATE_FILE               : "ecs-template.yaml"
   ECS_STACK_NAME                  : "awsdotneteshop-ecs"
   AWS_REGION_NAME                 : "us-east-1" 
-  # AGGREGATOR_DOCKER_FILE_NAME     : "src/ApiGateways/Web.Bff.Shopping/aggregator/Dockerfile"
-  # CATALOG_API_DOCKER_FILE_NAME    : "src/Services/Catalog/Catalog.API/Dockerfile"
 
 on:
   push:
@@ -39,8 +37,8 @@ jobs:
 
     - name: Deploy ECR stack
       run: |
-        STACK_NAME=${{env.ECR_STACK_NAME}} # Replace with your desired stack name
-        TEMPLATE_FILE=${{env.ECR_TEMPLATE_FILE}} # Replace with the path to your CloudFormation template
+        STACK_NAME=${{env.ECR_STACK_NAME}}
+        TEMPLATE_FILE=${{env.ECR_TEMPLATE_FILE}}
 
         aws cloudformation deploy \
           --stack-name $STACK_NAME \

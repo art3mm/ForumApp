@@ -1,4 +1,7 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using System.Reflection.PortableExecutable;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
@@ -34,11 +37,20 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<CatalogContext>();
     var settings = app.Services.GetService<IOptions<CatalogSettings>>();
     var logger = app.Services.GetService<ILogger<CatalogContextSeed>>();
-    await context.Database.MigrateAsync();
 
-    await new CatalogContextSeed().SeedAsync(context, app.Environment, settings, logger);
-    var integEventContext = scope.ServiceProvider.GetRequiredService<IntegrationEventLogContext>();
-    await integEventContext.Database.MigrateAsync();
+    var healthCheck = app.Services.GetService<HealthCheckService>();
+    var healthReport = await healthCheck.CheckHealthAsync();
+
+    var dbStatus = healthReport.Entries.First(e => e.Key == "CatalogDB-check");
+
+    if (dbStatus.Value.Status==HealthStatus.Healthy)
+    {
+        await context.Database.MigrateAsync();
+
+        await new CatalogContextSeed().SeedAsync(context, app.Environment, settings, logger);
+        var integEventContext = scope.ServiceProvider.GetRequiredService<IntegrationEventLogContext>();
+        await integEventContext.Database.MigrateAsync();
+    }
 }
 
 await app.RunAsync();

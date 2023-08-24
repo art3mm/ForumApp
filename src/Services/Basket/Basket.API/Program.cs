@@ -6,9 +6,8 @@ builder.Services.AddGrpc();
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 
-//To do fix health checks
-//builder.Services.AddHealthChecks(builder.Configuration);
 builder.Services.AddDynamo(builder.Configuration);
+builder.Services.AddHealthChecks(builder.Configuration);
 
 builder.Services.AddTransient<ProductPriceChangedIntegrationEventHandler>();
 builder.Services.AddTransient<OrderStartedIntegrationEventHandler>();

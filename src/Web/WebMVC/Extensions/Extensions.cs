@@ -1,9 +1,14 @@
 ﻿// Fix samesite issue when running eShop from docker-compose locally as by default http protocol is being used
 // Refer to https://github.com/dotnet-architecture/eShopOnContainers/issues/1391
+
+using Polly;
+using Polly.Extensions.Http;
 using Yarp.ReverseProxy.Forwarder;
 
 internal static class Extensions
 {
+    private const int RetryCounts = 4;
+
     public static void AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHealthChecks()
@@ -24,10 +29,11 @@ internal static class Extensions
 
         // Add http client services
         services.AddHttpClient<IBasketService, BasketService>()
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Sample. Default lifetime is 2 minutes
-                .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5)) //Sample. Default lifetime is 2 minutes
+            .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
 
-        services.AddHttpClient<ICatalogService, CatalogService>();
+        services.AddHttpClient<ICatalogService, CatalogService>()
+                .AddPolicyHandler(GetRetryPolicy());
 
         services.AddHttpClient<IOrderingService, OrderingService>()
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
@@ -80,6 +86,14 @@ internal static class Extensions
         var requestConfig = new ForwarderRequestConfig();
 
         return app.MapForwarder("/hub/notificationhub/{**any}", destination, requestConfig, authTransformer);
+    }
+
+    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+            .WaitAndRetryAsync(RetryCounts, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 
     private sealed class BffAuthTransformer : HttpTransformer

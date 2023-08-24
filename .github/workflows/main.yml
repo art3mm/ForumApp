@@ -80,8 +80,8 @@ jobs:
     - name: Tag and push rabbitmq Doker image
       run: |
         IMAGE_ID=$(docker images --quiet rabbitmq:3-management-alpine)
-        docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/rabbitmq:3-management-alpine
-        docker push ${{ steps.login-ecr.outputs.registry }}/rabbitmq:3-management-alpine
+        docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/rabbitmq:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/rabbitmq:latest
 
     # - name: Deploy ECS stack
     #   run: |

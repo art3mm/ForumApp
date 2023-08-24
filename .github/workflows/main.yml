@@ -74,13 +74,13 @@ jobs:
     #     docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
     #     docker push ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
     
-    - name: Build rabbitmq Docker image
-      run: docker-compose -f src/docker-compose.yml build rabbitmq
+    - name: Pull RabbitMQ image
+      run: docker pull rabbitmq:3-management-alpine
     
     - name: Tag and push rabbitmq Doker image
       run: |
         IMAGE_ID=$(docker images --quiet rabbitmq:3-management-alpine)
-        docker tag rabbitmq:3-management-alpine ${{ steps.login-ecr.outputs.registry }}/rabbitmq:latest
+        docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/rabbitmq:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/rabitmq:latest
 
     # - name: Deploy ECS stack

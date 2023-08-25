@@ -296,7 +296,7 @@ Resources:
       Integration:
         Type: HTTP
         ConnectionType: VPC_LINK
-        ConnectionId: !Ref ApiGatewayVpcLink
+        ConnectionId: !Ref ApiGatewayWebAggregatorVpcLink
         Uri: !Sub 'http://${WebAggregatorNLB.DNSName}:80/swagger/index.html'
         IntegrationHttpMethod: GET
 

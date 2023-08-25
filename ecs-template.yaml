@@ -130,6 +130,12 @@ Resources:
       LogGroupName: /aws/ecs/CatalogApi
       RetentionInDays: 7
 
+  RabbitMQLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/RabbitMQ
+      RetentionInDays: 7
+
   ECSFargateTaskDefinitionWebAggregator:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -177,6 +183,30 @@ Resources:
               awslogs-group: !Ref CatalogApiLogsGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: CatalogApi
+  
+  ECSFargateTaskDefinitionRabbitMQ:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: ecs-fargate-task-rabbitmq
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !Ref ECSServiceRole
+      ContainerDefinitions:
+        - Name: ecs-fargate-container-rabbitmq
+          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "rabbitmq:latest"]]
+          Essential: true
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref RabbitMQLogsGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: RabbitMQ
 
   ECSEshopCluster:
     Type: AWS::ECS::Cluster
@@ -208,6 +238,25 @@ Resources:
         ServiceName: ecs-fargate-catalog-api-service
         Cluster: !Ref ECSEshopCluster
         TaskDefinition: !Ref ECSFargateTaskDefinitionCatalogApi
+        DeploymentConfiguration:
+          MinimumHealthyPercent: 0
+          MaximumPercent: 100
+        DesiredCount: 1
+        LaunchType: FARGATE
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            AssignPublicIp: DISABLED
+            SecurityGroups:
+            - !Ref ECSEshopSecurityGroup
+            Subnets:
+            - !Ref ECSPrivateSubnet
+
+  ECSFargateServiceRabbitMQ:
+      Type: AWS::ECS::Service
+      Properties:
+        ServiceName: ecs-fargate-catalog-rabbitmq
+        Cluster: !Ref ECSEshopCluster
+        TaskDefinition: !Ref ECSFargateTaskDefinitionRabbitMQ
         DeploymentConfiguration:
           MinimumHealthyPercent: 0
           MaximumPercent: 100

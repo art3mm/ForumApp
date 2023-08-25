@@ -257,6 +257,8 @@ Resources:
           - !Ref ECSEshopSecurityGroup
           Subnets:
           - !Ref ECSPublicSubnet
+      LoadBalancers:
+        - TargetGroupArn: !Ref WebAggregatorTargetGroup
 
   ApiGatewayWebAggregatorVpcLink:
     Type: AWS::ApiGateway::VpcLink
@@ -295,7 +297,7 @@ Resources:
         Type: HTTP
         ConnectionType: VPC_LINK
         ConnectionId: !Ref ApiGatewayVpcLink
-        Uri: !Sub 'http://${MyNLB.DNSName}:80/swagger/index.html'
+        Uri: !Sub 'http://${WebAggregatorNLB.DNSName}:80/swagger/index.html'
         IntegrationHttpMethod: GET
 
   ECSFargateServiceCatalogApi:

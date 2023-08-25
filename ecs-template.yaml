@@ -213,6 +213,32 @@ Resources:
     Properties:
       ClusterName: ecs-eshop-cluster
 
+  WebAggregatorNLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: network
+      Subnets:
+        - !Ref ECSPublicSubnet
+        - !Ref ECSPrivateSubnet
+
+  WebAggregatorTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: TCP
+      TargetType: ip
+      VpcId: !Ref VPC
+
+  WebAggregatorListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref WebAggregatorNLB
+      Port: 80
+      Protocol: TCP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebAggregatorTargetGroup
+
   ECSFargateServiceWebAggregator:
     Type: AWS::ECS::Service
     Properties:
@@ -226,11 +252,51 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+          AssignPublicIp: DISABLED
           SecurityGroups:
           - !Ref ECSEshopSecurityGroup
           Subnets:
           - !Ref ECSPublicSubnet
+
+  ApiGatewayWebAggregatorVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: WebAggregatorVPCLink
+      TargetArns:
+        - !GetAtt WebAggregatorNLB.LoadBalancerArn
+
+  ApiGatewayWebAggregatorRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: WebAggregatorApi
+
+  ApiGatewayWebAggregatorDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: ApiGatewayWebAggregatorMethod
+    Properties:
+      RestApiId: !Ref ApiGatewayWebAggregatorRestApi
+      StageName: v1
+
+  ApiGatewayWebAggregatorResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGatewayWebAggregatorRestApi
+      ParentId: !GetAtt ApiGatewayWebAggregatorRestApi.RootResourceId
+      PathPart: swagger
+
+  ApiGatewayWebAggregatorMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGatewayWebAggregatorRestApi
+      ResourceId: !Ref ApiGatewayWebAggregatorResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref ApiGatewayVpcLink
+        Uri: !Sub 'http://${MyNLB.DNSName}:80/swagger/index.html'
+        IntegrationHttpMethod: GET
 
   ECSFargateServiceCatalogApi:
       Type: AWS::ECS::Service
@@ -269,8 +335,3 @@ Resources:
             - !Ref ECSEshopSecurityGroup
             Subnets:
             - !Ref ECSPrivateSubnet
-
-  WebAggregatorApiGateway:
-    Type: "AWS::ApiGateway::RestApi"
-    Properties:
-      Name: "web-aggregator-apigateway"

@@ -11,10 +11,14 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: ecs-tasks.amazonaws.com
+              Service: ecs.amazonaws.com
             Action: sts:AssumeRole
+      Path: '/'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
               
   VPC:
     Type: AWS::EC2::VPC
@@ -159,6 +163,9 @@ Resources:
               awslogs-group: !Ref WebAggregatorLogsGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: WebAggregator
+          Environment:
+            - Name: CATALOG_API_URL
+              Value: !Sub 'http://${CatalogApiInternalLoadBalancer.DNSName}:80'
 
   ECSFargateTaskDefinitionCatalogApi:
     Type: AWS::ECS::TaskDefinition
@@ -183,6 +190,9 @@ Resources:
               awslogs-group: !Ref CatalogApiLogsGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: CatalogApi
+          Environment:
+            - Name: RABBITMQ_URL
+              Value: !Sub 'http://${ RabbitMQInternalLoadBalancer.DNSName}:80'
   
   ECSFargateTaskDefinitionRabbitMQ:
     Type: AWS::ECS::TaskDefinition
@@ -219,7 +229,6 @@ Resources:
       Type: network
       Subnets:
         - !Ref ECSPublicSubnet
-        - !Ref ECSPrivateSubnet
 
   WebAggregatorTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -228,6 +237,8 @@ Resources:
       Protocol: TCP
       TargetType: ip
       VpcId: !Ref VPC
+      LoadBalancerArns:
+        - !Ref WebAggregatorNLB
 
   WebAggregatorListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -259,13 +270,15 @@ Resources:
           - !Ref ECSPublicSubnet
       LoadBalancers:
         - TargetGroupArn: !Ref WebAggregatorTargetGroup
+          ContainerName: ecs-fargate-container-web-aggregator
+          ContainerPort: 80
 
   ApiGatewayWebAggregatorVpcLink:
     Type: AWS::ApiGateway::VpcLink
     Properties:
       Name: WebAggregatorVPCLink
       TargetArns:
-        - !GetAtt WebAggregatorNLB.LoadBalancerArn
+        - !Ref WebAggregatorNLB
 
   ApiGatewayWebAggregatorRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -300,40 +313,104 @@ Resources:
         Uri: !Sub 'http://${WebAggregatorNLB.DNSName}:80/swagger/index.html'
         IntegrationHttpMethod: GET
 
+  CatalogApiInternalLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internal
+      SecurityGroups:
+        - !Ref ECSEshopSecurityGroup
+      Subnets:
+        - !Ref ECSPrivateSubnet
+
+  CatalogApiTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      TargetType: ip
+
+  CatalogApiListener: 
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref CatalogApiInternalLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref CatalogApiTargetGroup
+          Type: forward
+  
   ECSFargateServiceCatalogApi:
-      Type: AWS::ECS::Service
-      Properties:
-        ServiceName: ecs-fargate-catalog-api-service
-        Cluster: !Ref ECSEshopCluster
-        TaskDefinition: !Ref ECSFargateTaskDefinitionCatalogApi
-        DeploymentConfiguration:
-          MinimumHealthyPercent: 0
-          MaximumPercent: 100
-        DesiredCount: 1
-        LaunchType: FARGATE
-        NetworkConfiguration:
-          AwsvpcConfiguration:
-            AssignPublicIp: DISABLED
-            SecurityGroups:
-            - !Ref ECSEshopSecurityGroup
-            Subnets:
-            - !Ref ECSPrivateSubnet
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: ecs-fargate-catalog-api-service
+      Cluster: !Ref ECSEshopCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinitionCatalogApi
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+          - !Ref ECSEshopSecurityGroup
+          Subnets:
+          - !Ref ECSPrivateSubnet
+      LoadBalancers:
+        - TargetGroupArn: !Ref CatalogApiTargetGroup
+          ContainerName: ecs-fargate-container-catalog-api
+          ContainerPort: 80
+  
+  RabbitMQInternalLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internal
+      SecurityGroups:
+        - !Ref ECSEshopSecurityGroup
+      Subnets:
+        - !Ref ECSPrivateSubnet
+
+  RabbitMQTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      TargetType: ip
+
+  RabbitMQListener: 
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref RabbitMQInternalLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref RabbitMQTargetGroup
+          Type: forward
 
   ECSFargateServiceRabbitMQ:
-      Type: AWS::ECS::Service
-      Properties:
-        ServiceName: ecs-fargate-catalog-rabbitmq
-        Cluster: !Ref ECSEshopCluster
-        TaskDefinition: !Ref ECSFargateTaskDefinitionRabbitMQ
-        DeploymentConfiguration:
-          MinimumHealthyPercent: 0
-          MaximumPercent: 100
-        DesiredCount: 1
-        LaunchType: FARGATE
-        NetworkConfiguration:
-          AwsvpcConfiguration:
-            AssignPublicIp: DISABLED
-            SecurityGroups:
-            - !Ref ECSEshopSecurityGroup
-            Subnets:
-            - !Ref ECSPrivateSubnet
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: ecs-fargate-catalog-rabbitmq
+      Cluster: !Ref ECSEshopCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinitionRabbitMQ
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+          - !Ref ECSEshopSecurityGroup
+          Subnets:
+          - !Ref ECSPrivateSubnet
+      LoadBalancers:
+        - TargetGroupArn: !Ref RabbitMQTargetGroup
+          ContainerName: ecs-fargate-container-rabbitmq
+          ContainerPort: 80

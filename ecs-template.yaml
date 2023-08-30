@@ -48,7 +48,7 @@ Resources:
         Fn::Select: 
           - 1
           - Fn::GetAZs: ""
-      
+
   ECSEshopSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -206,7 +206,7 @@ Resources:
       ExecutionRoleArn: !Ref ECSServiceRole
       ContainerDefinitions:
         - Name: ecs-fargate-container-rabbitmq
-          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "rabbitmq:latest"]]
+          Image: 'rabbitmq:3-management-alpine'
           Essential: true
           Memory: 128
           PortMappings:

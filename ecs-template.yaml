@@ -246,6 +246,27 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: ecs-eshop-cluster
+  
+  WebAggreregatorInternalALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: webaggregator-internal-alb
+      Scheme: internal
+      SecurityGroups:
+        - !Ref ECSEshopSecurityGroup
+      Subnets:
+        - !Ref ECSPublicSubnet
+        - !Ref ECSPublicSubnet2
+      Type: application
+  
+  WebAggregatorALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: webaggregator-alb-target-group
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
 
   ECSFargateServiceWebAggregator:
     Type: AWS::ECS::Service
@@ -266,6 +287,76 @@ Resources:
           Subnets:
           - !Ref ECSPublicSubnet
           - !Ref ECSPublicSubnet2
+      LoadBalancers:
+        - TargetGroupArn: !Ref WebAggregatorALBTargetGroup
+          ContainerName: ecs-fargate-container-web-aggregator
+          ContainerPort: 80
+
+  WebAggregatorInternalALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref WebAggregatorALBTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref WebAggregatorInternalALB
+      Port: 80
+      Protocol: HTTP
+
+  VPCLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: EshopVPCLink
+      TargetArns:
+        - !GetAtt WebAggregatorInternalALB.LoadBalancerArn
+
+  EshopApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: 'EshopApi'
+
+  EshopApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt EshopApi.RootResourceId
+      PathPart: callwebaggregator
+      RestApiId: !Ref EshopApi
+
+  EshopApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: ANY
+      ResourceId: !Ref EshopApiResource
+      RestApiId: !Ref EshopApi
+      AuthorizationType: NONE
+      Integration:
+        Type: HTTP_PROXY
+        IntegrationHttpMethod: ANY
+        Uri: !Join ['', ['http://', !GetAtt WebAggreregatorInternalALB.DNSName, '/']]
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref VPCLink
+        PassthroughBehavior: WHEN_NO_MATCH
+
+  CatalogApiTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: catalog-api-target-group
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
+
+  CatalogApiListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - TargetGroupArn: !Ref CatalogApiTargetGroup
+          Type: forward
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - "/c/*"
+      ListenerArn: !Ref WebAggregatorInternalALBListener
+      Priority: 10
 
   ECSFargateServiceCatalogApi:
       Type: AWS::ECS::Service
@@ -286,6 +377,10 @@ Resources:
             Subnets:
             - !Ref ECSPrivateSubnet
             - !Ref ECSPrivateSubnet2
+        LoadBalancers:
+        - TargetGroupArn: !Ref CatalogApiTargetGroup
+          ContainerName: ecs-fargate-container-catalog-api
+          ContainerPort: 80
 
   ECSFargateServiceRabbitMQ:
     Type: AWS::ECS::Service

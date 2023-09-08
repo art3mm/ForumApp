@@ -43,14 +43,14 @@ using (var scope = app.Services.CreateScope())
 
     var dbStatus = healthReport.Entries.First(e => e.Key == "CatalogDB-check");
 
-    if (dbStatus.Value.Status==HealthStatus.Healthy)
-    {
-        await context.Database.MigrateAsync();
+    //if (dbStatus.Value.Status==HealthStatus.Healthy)
+    //{
+    //    await context.Database.MigrateAsync();
 
-        await new CatalogContextSeed().SeedAsync(context, app.Environment, settings, logger);
-        var integEventContext = scope.ServiceProvider.GetRequiredService<IntegrationEventLogContext>();
-        await integEventContext.Database.MigrateAsync();
-    }
+    //    await new CatalogContextSeed().SeedAsync(context, app.Environment, settings, logger);
+    //    var integEventContext = scope.ServiceProvider.GetRequiredService<IntegrationEventLogContext>();
+    //    await integEventContext.Database.MigrateAsync();
+    //}
 }
 
 await app.RunAsync();

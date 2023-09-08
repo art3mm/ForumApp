@@ -169,17 +169,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - urls__basket=http://basket-api
-      - urls__catalog=http://${ESHOP_EXTERNAL_CATALOG_DNS_NAME}/catalog-api
+      - urls__catalog=http://internal-catalog-api-lb-2066759985.eu-central-1.elb.amazonaws.com
       - urls__orders=http://ordering-api
       - urls__identity=http://identity-api
       - urls__grpcBasket=http://basket-api:81
       - urls__grpcCatalog=http://catalog-api:81
       - urls__grpcOrdering=http://ordering-api:81
       - ReverseProxy__Clusters__basket__Destinations__destination0__Address=http://basket-api
-      - ReverseProxy__Clusters__catalog__Destinations__destination0__Address=http://${ESHOP_EXTERNAL_CATALOG_DNS_NAME}/catalog-api
+      - ReverseProxy__Clusters__catalog__Destinations__destination0__Address=http://internal-catalog-api-lb-2066759985.eu-central-1.elb.amazonaws.com
       - ReverseProxy__Clusters__orders__Destinations__destination0__Address=http://ordering-api
       - ReverseProxy__Clusters__signalr__Destinations__destination0__Address=http://ordering-signalrhub
-      - CatalogUrlHC=http://${ESHOP_EXTERNAL_CATALOG_DNS_NAME}/catalog-api/hc
+      - CatalogUrlHC=http://internal-catalog-api-lb-2066759985.eu-central-1.elb.amazonaws.com/hc
       - OrderingUrlHC=http://ordering-api/hc
       - IdentityUrlHC=http://identity-api/hc
       - BasketUrlHC=http://basket-api/hc

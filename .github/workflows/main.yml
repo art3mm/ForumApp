@@ -74,12 +74,12 @@ jobs:
         docker tag ${IMAGE_ID} ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
         docker push ${{ steps.login-ecr.outputs.registry }}/catalog-api:latest
     
-    # - name: Deploy ECS stack
-    #   run: |
-    #     STACK_NAME=${{env.ECS_STACK_NAME}}
-    #     TEMPLATE_FILE=${{env.ECS_TEMPLATE_FILE}}
+    - name: Deploy ECS stack
+      run: |
+        STACK_NAME=${{env.ECS_STACK_NAME}}
+        TEMPLATE_FILE=${{env.ECS_TEMPLATE_FILE}}
 
-    #     aws cloudformation deploy \
-    #       --stack-name $STACK_NAME \
-    #       --template-file $TEMPLATE_FILE \
-    #       --capabilities CAPABILITY_NAMED_IAM
+        aws cloudformation deploy \
+          --stack-name $STACK_NAME \
+          --template-file $TEMPLATE_FILE \
+          --capabilities CAPABILITY_NAMED_IAM

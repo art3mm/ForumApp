@@ -67,6 +67,21 @@ Resources:
           - 1
           - Fn::GetAZs: ""
 
+  WebAggregatorALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound HTTP(S) traffic from anywhere to the ALB
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+
   ECSEshopSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -170,10 +185,62 @@ Resources:
       LogGroupName: /aws/ecs/RabbitMQ
       RetentionInDays: 7
 
-  ECSFargateTaskDefinitionWebAggregator:
+  ECSEshopCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: ecs-eshop-cluster
+
+  InternalALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound HTTP traffic from ECS tasks
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !GetAtt ECSEshopSecurityGroup.GroupId
+
+  RabbitMQInternalALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: rabbitmq-api-lb
+      Subnets:
+        - !Ref ECSPrivateSubnet
+        - !Ref ECSPrivateSubnet2
+      SecurityGroups:
+        - !Ref InternalALBSecurityGroup
+      Scheme: internal
+      Type: application
+
+  RabbitMQTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: RabbitMQInternalALB
+    Properties:
+      Name: rabbitmq-targetgroup
+      Port: 80
+      HealthCheckPath: /hc
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
+
+  RabbitMQInternalALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref RabbitMQInternalALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: 200
+            ContentType: text/plain
+            MessageBody: Default fixed response
+
+  ECSFargateTaskDefinitionRabbitMQ:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: ecs-fargate-task-web-aggregator
+      Family: ecs-fargate-task-rabbitmq
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -181,8 +248,8 @@ Resources:
       Memory: '512'
       ExecutionRoleArn: !Ref ECSServiceRole
       ContainerDefinitions:
-        - Name: ecs-fargate-container-web-aggregator
-          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "web-aggregator:latest"]]
+        - Name: ecs-fargate-container-rabbitmq
+          Image: 'rabbitmq:3-management-alpine'
           Essential: true
           Memory: 128
           PortMappings:
@@ -190,9 +257,80 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref WebAggregatorLogsGroup
+              awslogs-group: !Ref RabbitMQLogsGroup
               awslogs-region: !Ref "AWS::Region"
-              awslogs-stream-prefix: WebAggregator
+              awslogs-stream-prefix: RabbitMQ
+  
+  ECSFargateServiceRabbitMQ:
+    Type: AWS::ECS::Service
+    DependsOn: RabbitMQInternalALBListener
+    Properties:
+      ServiceName: ecs-fargate-catalog-rabbitmq
+      Cluster: !Ref ECSEshopCluster
+      TaskDefinition: !Ref ECSFargateTaskDefinitionRabbitMQ
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+          - !Ref ECSEshopSecurityGroup
+          Subnets:
+          - !Ref ECSPrivateSubnet
+          - !Ref ECSPrivateSubnet2
+
+  CatalogApiInternalALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: catalog-api-lb
+      Subnets:
+        - !Ref ECSPrivateSubnet
+        - !Ref ECSPrivateSubnet2
+      SecurityGroups:
+        - !Ref InternalALBSecurityGroup
+      Scheme: internal
+      Type: application
+
+  CatalogApiTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: CatalogApiInternalALB
+    Properties:
+      Name: catalog-api-targetgroup
+      Port: 80
+      HealthCheckPath: /hc
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
+
+  CatalogApiInternalALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref CatalogApiInternalALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: 200
+            ContentType: text/plain
+            MessageBody: Default fixed response
+
+  CatalogApiALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref CatalogApiTargetGroup
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - "/c/*"
+      ListenerArn: !Ref CatalogApiInternalALBListener
+      Priority: 10
 
   ECSFargateTaskDefinitionCatalogApi:
     Type: AWS::ECS::TaskDefinition
@@ -217,149 +355,10 @@ Resources:
               awslogs-group: !Ref CatalogApiLogsGroup
               awslogs-region: !Ref "AWS::Region"
               awslogs-stream-prefix: CatalogApi
-  
-  ECSFargateTaskDefinitionRabbitMQ:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: ecs-fargate-task-rabbitmq
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      Cpu: '256'
-      Memory: '512'
-      ExecutionRoleArn: !Ref ECSServiceRole
-      ContainerDefinitions:
-        - Name: ecs-fargate-container-rabbitmq
-          Image: 'rabbitmq:3-management-alpine'
-          Essential: true
-          Memory: 128
-          PortMappings:
-            - ContainerPort: 80
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: !Ref RabbitMQLogsGroup
-              awslogs-region: !Ref "AWS::Region"
-              awslogs-stream-prefix: RabbitMQ
-
-  ECSEshopCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: ecs-eshop-cluster
-  
-  WebAggreregatorInternalALB:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Name: webaggregator-internal-alb
-      Scheme: internal
-      SecurityGroups:
-        - !Ref ECSEshopSecurityGroup
-      Subnets:
-        - !Ref ECSPublicSubnet
-        - !Ref ECSPublicSubnet2
-      Type: application
-  
-  WebAggregatorALBTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: webaggregator-alb-target-group
-      Port: 80
-      Protocol: HTTP
-      TargetType: ip
-      VpcId: !Ref VPC
-
-  ECSFargateServiceWebAggregator:
-    Type: AWS::ECS::Service
-    Properties:
-      ServiceName: ecs-fargate-web-aggregator-service
-      Cluster: !Ref ECSEshopCluster
-      TaskDefinition: !Ref ECSFargateTaskDefinitionWebAggregator
-      DeploymentConfiguration:
-        MinimumHealthyPercent: 0
-        MaximumPercent: 100
-      DesiredCount: 2
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
-          SecurityGroups:
-          - !Ref ECSEshopSecurityGroup
-          Subnets:
-          - !Ref ECSPublicSubnet
-          - !Ref ECSPublicSubnet2
-      LoadBalancers:
-        - TargetGroupArn: !Ref WebAggregatorALBTargetGroup
-          ContainerName: ecs-fargate-container-web-aggregator
-          ContainerPort: 80
-
-  WebAggregatorInternalALBListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - TargetGroupArn: !Ref WebAggregatorALBTargetGroup
-          Type: forward
-      LoadBalancerArn: !Ref WebAggregatorInternalALB
-      Port: 80
-      Protocol: HTTP
-
-  VPCLink:
-    Type: AWS::ApiGateway::VpcLink
-    Properties:
-      Name: EshopVPCLink
-      TargetArns:
-        - !GetAtt WebAggregatorInternalALB.LoadBalancerArn
-
-  EshopApi:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: 'EshopApi'
-
-  EshopApiResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt EshopApi.RootResourceId
-      PathPart: callwebaggregator
-      RestApiId: !Ref EshopApi
-
-  EshopApiMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      HttpMethod: ANY
-      ResourceId: !Ref EshopApiResource
-      RestApiId: !Ref EshopApi
-      AuthorizationType: NONE
-      Integration:
-        Type: HTTP_PROXY
-        IntegrationHttpMethod: ANY
-        Uri: !Join ['', ['http://', !GetAtt WebAggreregatorInternalALB.DNSName, '/']]
-        ConnectionType: VPC_LINK
-        ConnectionId: !Ref VPCLink
-        PassthroughBehavior: WHEN_NO_MATCH
-
-  CatalogApiTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: catalog-api-target-group
-      Port: 80
-      Protocol: HTTP
-      TargetType: ip
-      VpcId: !Ref VPC
-
-  CatalogApiListenerRule:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      Actions:
-        - TargetGroupArn: !Ref CatalogApiTargetGroup
-          Type: forward
-      Conditions:
-        - Field: path-pattern
-          Values:
-            - "/c/*"
-      ListenerArn: !Ref WebAggregatorInternalALBListener
-      Priority: 10
 
   ECSFargateServiceCatalogApi:
       Type: AWS::ECS::Service
+      DependsOn: CatalogApiInternalALBListener
       Properties:
         ServiceName: ecs-fargate-catalog-api-service
         Cluster: !Ref ECSEshopCluster
@@ -377,17 +376,75 @@ Resources:
             Subnets:
             - !Ref ECSPrivateSubnet
             - !Ref ECSPrivateSubnet2
-        LoadBalancers:
-        - TargetGroupArn: !Ref CatalogApiTargetGroup
-          ContainerName: ecs-fargate-container-catalog-api
-          ContainerPort: 80
 
-  ECSFargateServiceRabbitMQ:
-    Type: AWS::ECS::Service
+  ECSFargateTaskDefinitionWebAggregator:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ECSFargateServiceCatalogApi
     Properties:
-      ServiceName: ecs-fargate-catalog-rabbitmq
+      Family: ecs-fargate-task-web-aggregator
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      ExecutionRoleArn: !Ref ECSServiceRole
+      ContainerDefinitions:
+        - Name: ecs-fargate-container-web-aggregator
+          Image: !Join ["", [!Ref "AWS::AccountId", ".dkr.ecr.", !Ref "AWS::Region", ".amazonaws.com/", "web-aggregator:latest"]]
+          Essential: true
+          Memory: 128
+          PortMappings:
+            - ContainerPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref WebAggregatorLogsGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: WebAggregator
+
+  WebAggregatorALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: webaggregator-alb
+      Scheme: internet-facing
+      Subnets:
+        - !Ref ECSPublicSubnet
+        - !Ref ECSPublicSubnet2
+      SecurityGroups:
+        - !Ref WebAggregatorALBSecurityGroup
+
+  WebAggregatorALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref WebAggregatorALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebAggregatorTargetGroup
+  
+  WebAggregatorTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: WebAggregatorALB
+    Properties:
+      Name: webaggregator-targetgroup
+      Port: 80
+      HealthCheckPath: /swagger/index.html
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPC
+      
+  ECSFargateServiceWebAggregator:
+    Type: AWS::ECS::Service
+    DependsOn: WebAggregatorALBListener
+    Properties:
+      ServiceName: ecs-fargate-web-aggregator-service
       Cluster: !Ref ECSEshopCluster
-      TaskDefinition: !Ref ECSFargateTaskDefinitionRabbitMQ
+      TaskDefinition: !Ref ECSFargateTaskDefinitionWebAggregator
+      LoadBalancers:
+        - TargetGroupArn: !Ref WebAggregatorTargetGroup
+          ContainerName: ecs-fargate-container-web-aggregator
+          ContainerPort: 80
       DeploymentConfiguration:
         MinimumHealthyPercent: 0
         MaximumPercent: 100
@@ -395,9 +452,32 @@ Resources:
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          AssignPublicIp: ENABLED
           SecurityGroups:
           - !Ref ECSEshopSecurityGroup
           Subnets:
-          - !Ref ECSPrivateSubnet
-          - !Ref ECSPrivateSubnet2
+          - !Ref ECSPublicSubnet
+          - !Ref ECSPublicSubnet2
+  
+  WebAggregatorProxyResource:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+        Name: WebAggregatorApiGateway
+        ProtocolType: HTTP
+
+  WebAggregatorRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebAggregatorProxyResource
+      RouteKey: ANY /{proxy+}
+      Target: !Sub integrations/${WebAggregatorHttpProxyIntegration}
+
+  WebAggregatorHttpProxyIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebAggregatorProxyResource
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: !Join ['', ['http://', !GetAtt  WebAggregatorALB.DNSName, '/{proxy}']]
+      PayloadFormatVersion: 1.0
+      ConnectionType: INTERNET

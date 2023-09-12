@@ -5,14 +5,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services.AddGrpc();
+// builder.Services.AddGrpc();
 builder.Services.AddControllers();
 
 // Application specific services
 //builder.Services.AddHealthChecks(builder.Configuration);
 builder.Services.AddDbContexts(builder.Configuration);
 builder.Services.AddApplicationOptions(builder.Configuration);
-builder.Services.AddIntegrationServices();
+//builder.Services.AddIntegrationServices();
 
 //builder.Services.AddTransient<OrderStatusChangedToAwaitingValidationIntegrationEventHandler>();
 //builder.Services.AddTransient<OrderStatusChangedToPaidIntegrationEventHandler>();

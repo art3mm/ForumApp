@@ -38,12 +38,14 @@ public static class Extensions
 
         services.AddDbContext<CatalogContext>(options =>
         {
-            options.UseMySQL(configuration.GetRequiredConnectionString("CatalogDB"), ConfigureMySqlOptions);
+            // options.UseMySQL(configuration.GetRequiredConnectionString("CatalogDB"), ConfigureMySqlOptions);
+            options.UseInMemoryDatabase("Mock_DB");
         });
 
         services.AddDbContext<IntegrationEventLogContext>(options =>
         {
-            options.UseMySQL(configuration.GetRequiredConnectionString("CatalogDB"), ConfigureMySqlOptions);
+            // options.UseMySQL(configuration.GetRequiredConnectionString("CatalogDB"), ConfigureMySqlOptions);
+            options.UseInMemoryDatabase("Mock_DB");
         });
 
         return services;

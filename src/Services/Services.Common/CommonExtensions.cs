@@ -74,7 +74,7 @@ public static class CommonExtensions
 
         app.UseDefaultOpenApi(app.Configuration);
 
-        app.MapDefaultHealthChecks();
+        // app.MapDefaultHealthChecks();
 
         return app;
     }

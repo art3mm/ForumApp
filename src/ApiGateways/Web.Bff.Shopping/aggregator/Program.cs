@@ -1,7 +1,7 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddReverseProxy(builder.Configuration);
 builder.Services.AddControllers();
 

@@ -17,6 +17,13 @@ public class CatalogController : ControllerBase
         context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
+    [HttpGet]
+    [Route("test")]
+    public IActionResult Test()
+    {
+        return Ok("Test connection");
+    }
+
     // GET api/v1/[controller]/items[?pageSize=3&pageIndex=10]
     [HttpGet]
     [Route("items")]

@@ -24,23 +24,23 @@ public static class CommonExtensions
     public static WebApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
         // Shared configuration via key vault
-        builder.Configuration.AddKeyVault();
+        //builder.Configuration.AddKeyVault();
 
         // Env valiables
         builder.Configuration.AddEnvironmentVariables();
 
         // Shared app insights configuration
-        builder.Services.AddApplicationInsights(builder.Configuration);
+        //builder.Services.AddApplicationInsights(builder.Configuration);
 
         // Default health checks assume the event bus and self health checks
-        builder.Services.AddDefaultHealthChecks(builder.Configuration);
+        //builder.Services.AddDefaultHealthChecks(builder.Configuration);
 
         // Add the event bus
-        builder.Services.AddEventBus(builder.Configuration);
+        //builder.Services.AddEventBus(builder.Configuration);
 
-        builder.Services.AddDefaultAuthentication(builder.Configuration);
+        //builder.Services.AddDefaultAuthentication(builder.Configuration);
 
-        builder.Services.AddDefaultOpenApi(builder.Configuration);
+        //builder.Services.AddDefaultOpenApi(builder.Configuration);
 
         // Add the accessor
         builder.Services.AddHttpContextAccessor();

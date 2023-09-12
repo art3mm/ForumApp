@@ -82,7 +82,7 @@ public static class Extensions
         services.AddTransient<Func<DbConnection, IIntegrationEventLogService>>(
             sp => (DbConnection c) => new IntegrationEventLogService(c));
 
-        services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
+        // services.AddTransient<ICatalogIntegrationEventService, CatalogIntegrationEventService>();
 
         return services;
     }
